@@ -20,7 +20,7 @@ data <- df_transportasi %>%
   left_join(df_pendidikan, by = "Provinsi")
 ```
 
-# Visual
+# Visualisasi
 
 ```{R}
 top5_transportasi <- df_transportasi %>%
