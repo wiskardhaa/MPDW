@@ -1,1 +1,40 @@
 
+# Library
+
+```{R}
+library(readxl)
+library(sf)
+library(dplyr)
+library(ggplot2)
+```
+
+# Data
+
+```{R}
+df_transportasi   <- read_excel("D:/File/Data Science/SuRe/Data Klastering.xlsx", sheet = "Transportasi")
+df_kesehatan      <- read_excel("D:/File/Data Science/SuRe/Data Klastering.xlsx", sheet = "Kesehatan")
+df_pendidikan     <- read_excel("D:/File/Data Science/SuRe/Data Klastering.xlsx", sheet = "Pendidikan")
+
+data <- df_transportasi %>%
+  left_join(df_kesehatan, by = "Provinsi") %>%
+  left_join(df_pendidikan, by = "Provinsi")
+```
+
+# Visual
+
+```{R}
+top5_transportasi <- df_transportasi %>%
+  arrange(desc(`Panjang Jalan (km)`)) %>%
+  slice_head(n = 5)
+
+ggplot(top5_transportasi, aes(x = reorder(`Provinsi`, `Panjang Jalan (km)`), y = `Panjang Jalan (km)`)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Top 5 Jalan Terpanjang di Indonesia",
+    x = "Provinsi",
+    y = "Panjang (km)"
+  ) +
+  theme_minimal()
+```   
+
