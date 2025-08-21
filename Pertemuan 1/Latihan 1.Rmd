@@ -1,1 +1,89 @@
 
+
+
+
+
+# Library
+
+```{r}
+library(readxl)
+library(dplyr)
+library(sf)
+library(ggplot2)
+library(cluster)
+library(factoextra)
+library(stringr)
+library(RColorBrewer)
+```
+
+# Data
+
+```{r}
+df_transportasi   <- read_excel("D:/File/Data Science/SuRe/Data Klastering.xlsx", sheet = "Transportasi")
+df_kesehatan      <- read_excel("D:/File/Data Science/SuRe/Data Klastering.xlsx", sheet = "Kesehatan")
+df_pendidikan     <- read_excel("D:/File/Data Science/SuRe/Data Klastering.xlsx", sheet = "Pendidikan")
+df_penduduk       <- read_excel("D:/File/Data Science/SuRe/Data Klastering.xlsx", sheet = "Penduduk")
+df_luas           <- read_excel("D:/File/Data Science/SuRe/Data Klastering.xlsx", sheet = "Luas")
+
+data <- df_transportasi %>%
+  left_join(df_kesehatan, by = "Provinsi") %>%
+  left_join(df_pendidikan, by = "Provinsi") %>%
+  left_join(df_penduduk, by = "Provinsi") %>%
+  left_join(df_luas, by = "Provinsi")
+```
+
+# Visualisasi Sederhana
+## Top 5 Provinsi dengan Jalan Terpanjang
+
+```{r}
+top5_transportasi <- df_transportasi %>%
+  arrange(desc(`Panjang Jalan (km)`)) %>%
+  slice_head(n = 5)
+
+ggplot(top5_transportasi, aes(x = reorder(`Provinsi`, `Panjang Jalan (km)`), y = `Panjang Jalan (km)`)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Top 5 Jalan Terpanjang di Indonesia",
+    x = "Provinsi",
+    y = "Panjang (km)"
+  ) +
+  theme_minimal()
+```
+
+## Top 5 Provinsi dengan Jumlah Sarana Kesehatan Terbanyak
+
+```{r}
+top5_kesehatan <- df_kesehatan %>%
+  arrange(desc(`Jumlah Sarana Kesehatan`)) %>%
+  slice_head(n = 5)
+
+ggplot(top5_kesehatan, aes(x = reorder(Provinsi, `Jumlah Sarana Kesehatan`), y = `Jumlah Sarana Kesehatan`)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Top 5 Provinsi dengan Sarana Kesehatan Terbanyak di Indonesia",
+    x = "Provinsi",
+    y = "Jumlah Sarana Kesehatan"
+  ) +
+  theme_minimal()
+```
+
+## Top 5 Provinsi dengan Jumlah SMA Terbanyak
+
+```{r}
+top5_pendidikan <- df_pendidikan %>%
+  arrange(desc(`Jumlah SMA`)) %>%
+  slice_head(n = 5)
+
+ggplot(top5_pendidikan, aes(x = reorder(Provinsi, `Jumlah SMA`), y = `Jumlah SMA`)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Top 5 Provinsi dengan Jumlah Sekolah SMA Terbanyak di Indonesia",
+    x = "Provinsi",
+    y = "Jumlah SMA"
+  ) +
+  theme_minimal()
+```
+
