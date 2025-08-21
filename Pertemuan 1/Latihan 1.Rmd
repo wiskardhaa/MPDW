@@ -1,7 +1,13 @@
+---
+title: "Latihan 1 MPDW"
+author: "Wiska Radhia Firdaus - G1401231017"
+date: "2025-08-19"
+output: html_document
+---
 
-
-
-
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
 # Library
 
