@@ -357,65 +357,106 @@ display: none;
 </div>
 
 
-<div id="package-untuk-mpdw" class="section level1">
-<h1>Package untuk MPDW</h1>
-<pre class="r"><code>options(repos = c(CRAN = &quot;https://cloud.r-project.org&quot;))</code></pre>
-<pre class="r"><code>install.packages(c(&quot;forecast&quot;,&quot;graphics&quot;,&quot;TTR&quot;,&quot;TSA&quot;,&quot;aTSA&quot;,&quot;lmtest&quot;,&quot;MLmetrics&quot;,&quot;car&quot;,&quot;dplyr&quot;,&quot;MASS&quot;,&quot;tsibble&quot;,&quot;tseries&quot;,&quot;ggplot2&quot;,&quot;nortest&quot;))</code></pre>
-<pre><code>## Warning: package &#39;graphics&#39; is in use and will not be installed</code></pre>
-<pre><code>## Installing packages into &#39;C:/Users/MyBook Z Series/AppData/Local/R/win-library/4.4&#39;
-## (as &#39;lib&#39; is unspecified)</code></pre>
-<pre><code>## package &#39;forecast&#39; successfully unpacked and MD5 sums checked
-## package &#39;TTR&#39; successfully unpacked and MD5 sums checked
-## package &#39;TSA&#39; successfully unpacked and MD5 sums checked
-## package &#39;aTSA&#39; successfully unpacked and MD5 sums checked
-## package &#39;lmtest&#39; successfully unpacked and MD5 sums checked
-## package &#39;MLmetrics&#39; successfully unpacked and MD5 sums checked
-## package &#39;car&#39; successfully unpacked and MD5 sums checked
-## package &#39;dplyr&#39; successfully unpacked and MD5 sums checked</code></pre>
-<pre><code>## Warning: cannot remove prior installation of package &#39;dplyr&#39;</code></pre>
-<pre><code>## Warning in file.copy(savedcopy, lib, recursive = TRUE): problem copying
-## C:\Users\MyBook Z
-## Series\AppData\Local\R\win-library\4.4\00LOCK\dplyr\libs\x64\dplyr.dll to
-## C:\Users\MyBook Z
-## Series\AppData\Local\R\win-library\4.4\dplyr\libs\x64\dplyr.dll: Permission
-## denied</code></pre>
-<pre><code>## Warning: restored &#39;dplyr&#39;</code></pre>
-<pre><code>## package &#39;MASS&#39; successfully unpacked and MD5 sums checked
-## package &#39;tsibble&#39; successfully unpacked and MD5 sums checked
-## package &#39;tseries&#39; successfully unpacked and MD5 sums checked
-## package &#39;ggplot2&#39; successfully unpacked and MD5 sums checked
-## package &#39;nortest&#39; successfully unpacked and MD5 sums checked
-## 
-## The downloaded binary packages are in
-##  C:\Users\MyBook Z Series\AppData\Local\Temp\Rtmp4cYix4\downloaded_packages</code></pre>
-<pre class="r"><code>library()</code></pre>
-</div>
 <div id="library" class="section level1">
 <h1>Library</h1>
-<pre class="r"><code>library(readxl)</code></pre>
-<pre><code>## Warning: package &#39;readxl&#39; was built under R version 4.4.2</code></pre>
+<pre class="r"><code>library(aTSA)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;aTSA&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:graphics&#39;:
+## 
+##     identify</code></pre>
+<pre class="r"><code>library(car)</code></pre>
+<pre><code>## Warning: package &#39;car&#39; was built under R version 4.4.3</code></pre>
+<pre><code>## Loading required package: carData</code></pre>
+<pre><code>## Warning: package &#39;carData&#39; was built under R version 4.4.2</code></pre>
 <pre class="r"><code>library(dplyr)</code></pre>
 <pre><code>## Warning: package &#39;dplyr&#39; was built under R version 4.4.3</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:car&#39;:
+## 
+##     recode</code></pre>
 <pre><code>## The following objects are masked from &#39;package:stats&#39;:
 ## 
 ##     filter, lag</code></pre>
 <pre><code>## The following objects are masked from &#39;package:base&#39;:
 ## 
 ##     intersect, setdiff, setequal, union</code></pre>
-<pre class="r"><code>library(sf)</code></pre>
-<pre><code>## Warning: package &#39;sf&#39; was built under R version 4.4.2</code></pre>
-<pre><code>## Linking to GEOS 3.13.0, GDAL 3.10.1, PROJ 9.5.1; sf_use_s2() is TRUE</code></pre>
+<pre class="r"><code>library(forecast)</code></pre>
+<pre><code>## Warning: package &#39;forecast&#39; was built under R version 4.4.3</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
+##   method            from
+##   as.zoo.data.frame zoo</code></pre>
+<pre><code>## 
+## Attaching package: &#39;forecast&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:aTSA&#39;:
+## 
+##     forecast</code></pre>
 <pre class="r"><code>library(ggplot2)</code></pre>
 <pre><code>## Warning: package &#39;ggplot2&#39; was built under R version 4.4.3</code></pre>
-<pre class="r"><code>library(cluster)
-library(factoextra)</code></pre>
-<pre><code>## Warning: package &#39;factoextra&#39; was built under R version 4.4.2</code></pre>
-<pre><code>## Welcome! Want to learn more? See two factoextra-related books at https://goo.gl/ve3WBa</code></pre>
-<pre class="r"><code>library(stringr)</code></pre>
-<pre><code>## Warning: package &#39;stringr&#39; was built under R version 4.4.2</code></pre>
-<pre class="r"><code>library(RColorBrewer)</code></pre>
+<pre class="r"><code>library(graphics)
+library(lmtest)</code></pre>
+<pre><code>## Warning: package &#39;lmtest&#39; was built under R version 4.4.3</code></pre>
+<pre><code>## Loading required package: zoo</code></pre>
+<pre><code>## Warning: package &#39;zoo&#39; was built under R version 4.4.3</code></pre>
+<pre><code>## 
+## Attaching package: &#39;zoo&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     as.Date, as.Date.numeric</code></pre>
+<pre class="r"><code>library(MASS)</code></pre>
+<pre><code>## Warning: package &#39;MASS&#39; was built under R version 4.4.3</code></pre>
+<pre><code>## 
+## Attaching package: &#39;MASS&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     select</code></pre>
+<pre class="r"><code>library(MLmetrics)</code></pre>
+<pre><code>## Warning: package &#39;MLmetrics&#39; was built under R version 4.4.3</code></pre>
+<pre><code>## 
+## Attaching package: &#39;MLmetrics&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:base&#39;:
+## 
+##     Recall</code></pre>
+<pre class="r"><code>library(nortest)
+library(readxl)</code></pre>
+<pre><code>## Warning: package &#39;readxl&#39; was built under R version 4.4.2</code></pre>
+<pre class="r"><code>library(TSA)</code></pre>
+<pre><code>## Warning: package &#39;TSA&#39; was built under R version 4.4.3</code></pre>
+<pre><code>## Registered S3 methods overwritten by &#39;TSA&#39;:
+##   method       from    
+##   fitted.Arima forecast
+##   plot.Arima   forecast</code></pre>
+<pre><code>## 
+## Attaching package: &#39;TSA&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     acf, arima</code></pre>
+<pre><code>## The following object is masked from &#39;package:utils&#39;:
+## 
+##     tar</code></pre>
+<pre class="r"><code>library(tseries)</code></pre>
+<pre><code>## Warning: package &#39;tseries&#39; was built under R version 4.4.3</code></pre>
+<pre><code>## 
+## Attaching package: &#39;tseries&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:aTSA&#39;:
+## 
+##     adf.test, kpss.test, pp.test</code></pre>
+<pre class="r"><code>library(tsibble)</code></pre>
+<pre><code>## Warning: package &#39;tsibble&#39; was built under R version 4.4.3</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;tsibble&#39;:
+##   method               from 
+##   as_tibble.grouped_df dplyr</code></pre>
+<pre><code>## 
+## Attaching package: &#39;tsibble&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:zoo&#39;:
+## 
+##     index</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, union</code></pre>
+<pre class="r"><code>library(TTR)</code></pre>
+<pre><code>## Warning: package &#39;TTR&#39; was built under R version 4.4.3</code></pre>
 </div>
 <div id="data" class="section level1">
 <h1>Data</h1>

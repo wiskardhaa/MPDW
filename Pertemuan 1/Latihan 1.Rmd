@@ -9,31 +9,24 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Package untuk MPDW
-
-```{r}
-options(repos = c(CRAN = "https://cloud.r-project.org"))
-```
-
-```{r}
-install.packages(c("forecast","graphics","TTR","TSA","aTSA","lmtest","MLmetrics","car","dplyr","MASS","tsibble","tseries","ggplot2","nortest"))
-```
-
-```{r}
-library()
-```
-
 # Library
 
 ```{r}
-library(readxl)
+library(aTSA)
+library(car)
 library(dplyr)
-library(sf)
+library(forecast)
 library(ggplot2)
-library(cluster)
-library(factoextra)
-library(stringr)
-library(RColorBrewer)
+library(graphics)
+library(lmtest)
+library(MASS)
+library(MLmetrics)
+library(nortest)
+library(readxl)
+library(TSA)
+library(tseries)
+library(tsibble)
+library(TTR)
 ```
 
 # Data
