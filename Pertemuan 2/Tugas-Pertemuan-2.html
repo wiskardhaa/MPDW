@@ -974,12 +974,12 @@ akurasi_test.dma</code></pre>
 ## SSE   5.511198e+08
 ## MSE   2.204479e+07
 ## MAPE  6.600558e+01</code></pre>
-<p>Perhitungan akurasi menggunakan data latih menghasilkan nilai MAPE
-yang lebih dari 10% sehingga nilai akurasi ini dapat dikategorikan
+<p><br> Perhitungan akurasi menggunakan data latih menghasilkan nilai
+MAPE yang lebih dari 10% sehingga nilai akurasi ini dapat dikategorikan
 kurang baik.</p>
-<p>Metode terbaik dapat ditentukan melalui kecilnya nilai MAPE.</p>
-<p>Pada data latih, metode DMA lebih baik dibandingkan dengan metode
-SMA, sedangkan pada data uji, metode SMA lebih baik dibandingkan
+<p><br> Metode terbaik dapat ditentukan melalui kecilnya nilai MAPE.</p>
+<p><br> Pada data latih, metode DMA lebih baik dibandingkan dengan
+metode SMA, sedangkan pada data uji, metode SMA lebih baik dibandingkan
 DMA.</p>
 </div>
 </div>
@@ -1325,10 +1325,10 @@ akurasitesting_SSE</code></pre>
 <p>Berdasarkan nilai SSE, MSE, RMSE, dan MAPE di antara ketiga
 parameter, sesuai yang diharapkan bahwa nilai parameter <span class="math inline">\(λ=Null\)</span> menghasilkan akurasi yang lebih
 baik dibanding <span class="math inline">\(λ=0,2\)</span> dan <span class="math inline">\(λ=0,7\)</span> karena dioptimalkan dapat
-menyesuaikan dari -nya yang paling minimum. Hal ini dilihat dari nilai
-masing-masing ukuran akurasi yang lebih kecil. Berdasarkan nilai
-MAPE-nya, hasil ini dapat dikategorikan sebagai peramalan sangat
-baik.</p>
+menyesuaikan dari <span class="math inline">\(\textit{error}\)</span>-nya yang paling minimum.
+Hal ini dilihat dari nilai masing-masing ukuran akurasi yang lebih
+kecil. Berdasarkan nilai MAPE-nya, hasil ini dapat dikategorikan sebagai
+peramalan sangat baik.</p>
 </div>
 </div>
 <div id="double-exponential-smoothing-des" class="section level2">
@@ -1583,11 +1583,23 @@ MSEfull</code></pre>
 ## ske 1   16437695 36643866
 ## ske 2   14707634  5877432
 ## ske opt 13380427  4645799</code></pre>
-<p>Model DES lebih baik daripada model SES karena menghasilkan nilai MSE
-yang jauh lebih kecil pada dua skenario. Artinya, data testing tersebut
-cenderung memiliki tren sehingga lebih tepat dibandingkan </p>
+<p>Model DES lebih baik daripada model SES karena menghasilkan <span class="math inline">\(\textit{nilai MSE}\)</span> yang jauh lebih kecil
+pada dua skenario. Artinya, data testing tersebut cenderung memiliki
+tren sehingga Double Exponential Smoothing lebih tepat dibandingkan
+Single Exponential Smoothing</p>
 </div>
 </div>
+</div>
+<div id="kesimpulan" class="section level1">
+<h1>Kesimpulan</h1>
+<p>Metode smoothing yang paling cocok dipakai untuk data saham <span class="math inline">\(\textit{BREN}\)</span> ini adalah <span class="math inline">\(\textit{Double Exponential Smoothing
+(DES)}\)</span>, karena cocok untuk pola deret waktu yang memiliki tren.
+Data saham BREN ini memiliki <span class="math inline">\(\textit{volatilitas}\)</span> yang cukup tinggi,
+sehingga tidak memungkinkan bagi harga saham ini untuk bergerak naik dan
+turun dengan cukup cepat. Sehingga dapat menghasilkan tren naik ataupun
+turun, hal ini cocok bagi investor ritel melakukan <span class="math inline">\(\textit{scalping}\)</span> atau <span class="math inline">\(\textit{trading}\)</span> dalam jangka pendek.
+Selain itu, dapat dilihat juga dari keempat metode tersebut nilai MAPE
+yang paling baik berada pada metode Double Exponential Smoothing.</p>
 </div>
 
 

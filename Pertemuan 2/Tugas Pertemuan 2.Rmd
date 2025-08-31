@@ -219,11 +219,11 @@ colnames(akurasi_test.dma) <- c("Akurasi m = 5")
 akurasi_test.dma
 ```
 
-Perhitungan akurasi menggunakan data latih menghasilkan nilai MAPE yang lebih dari 10% sehingga nilai akurasi ini dapat dikategorikan kurang baik.
+<br> Perhitungan akurasi menggunakan data latih menghasilkan nilai MAPE yang lebih dari 10% sehingga nilai akurasi ini dapat dikategorikan kurang baik.
 
-Metode terbaik dapat ditentukan melalui kecilnya nilai MAPE.
+<br> Metode terbaik dapat ditentukan melalui kecilnya nilai MAPE.
 
-Pada data latih, metode DMA lebih baik dibandingkan dengan metode SMA, sedangkan pada data uji, metode SMA lebih baik dibandingkan DMA.
+<br> Pada data latih, metode DMA lebih baik dibandingkan dengan metode SMA, sedangkan pada data uji, metode SMA lebih baik dibandingkan DMA.
 
 
 # Single Exponential Smoothing & Double Exponential Smoothing
@@ -391,7 +391,7 @@ akurasitesting_MSE
 akurasitesting_RMSE
 ```
 
-Berdasarkan nilai SSE, MSE, RMSE, dan MAPE di antara ketiga parameter, sesuai yang diharapkan bahwa nilai parameter $λ=Null$ menghasilkan akurasi yang lebih baik dibanding $λ=0,2$ dan $λ=0,7$ karena dioptimalkan dapat menyesuaikan dari \textit{error}-nya yang paling minimum. Hal ini dilihat dari nilai masing-masing ukuran akurasi yang lebih kecil. Berdasarkan nilai MAPE-nya, hasil ini dapat dikategorikan sebagai peramalan sangat baik.
+Berdasarkan nilai SSE, MSE, RMSE, dan MAPE di antara ketiga parameter, sesuai yang diharapkan bahwa nilai parameter $λ=Null$ menghasilkan akurasi yang lebih baik dibanding $λ=0,2$ dan $λ=0,7$ karena dioptimalkan dapat menyesuaikan dari $\textit{error}$-nya yang paling minimum. Hal ini dilihat dari nilai masing-masing ukuran akurasi yang lebih kecil. Berdasarkan nilai MAPE-nya, hasil ini dapat dikategorikan sebagai peramalan sangat baik.
 
 ## Double Exponential Smoothing (DES)
 
@@ -521,4 +521,8 @@ colnames(MSEfull) <- c("ses","des")
 MSEfull
 ```
 
-Model DES lebih baik daripada model SES karena menghasilkan nilai MSE yang jauh lebih kecil pada dua skenario. Artinya, data testing tersebut cenderung memiliki tren sehingga \textit{Double Exponential Smoothing} lebih tepat dibandingkan \textit{Single Exponential Smoothing}
+Model DES lebih baik daripada model SES karena menghasilkan $\textit{nilai MSE}$ yang jauh lebih kecil pada dua skenario. Artinya, data testing tersebut cenderung memiliki tren sehingga Double Exponential Smoothing lebih tepat dibandingkan Single Exponential Smoothing
+
+
+# Kesimpulan
+Metode smoothing yang paling cocok dipakai untuk data saham $\textit{BREN}$ ini adalah $\textit{Double Exponential Smoothing (DES)}$, karena cocok untuk pola deret waktu yang memiliki tren. Data saham BREN ini memiliki $\textit{volatilitas}$ yang cukup tinggi, sehingga tidak memungkinkan bagi harga saham ini untuk bergerak naik dan turun dengan cukup cepat. Sehingga dapat menghasilkan tren naik ataupun turun, hal ini cocok bagi investor ritel melakukan $\textit{scalping}$ atau $\textit{trading}$ dalam jangka pendek. Selain itu, dapat dilihat juga dari keempat metode tersebut nilai MAPE yang paling baik berada pada metode Double Exponential Smoothing.
