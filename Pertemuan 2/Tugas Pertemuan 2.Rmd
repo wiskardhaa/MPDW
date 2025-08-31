@@ -221,13 +221,44 @@ akurasi_test.dma
 
 Perhitungan akurasi menggunakan data latih menghasilkan nilai MAPE yang lebih dari 10% sehingga nilai akurasi ini dapat dikategorikan kurang baik.
 
+Metode terbaik dapat ditentukan melalui kecilnya nilai MAPE.
+
 Pada data latih, metode DMA lebih baik dibandingkan dengan metode SMA, sedangkan pada data uji, metode SMA lebih baik dibandingkan DMA.
 
-```{r}
 
+# Single Exponential Smoothing & Double Exponential Smoothing
+## Pembagian Data
+
+```{r}
+training <- df[1:n_train, ]
+testing  <- df[(n_train+1):n, ]
+
+train.ts <- ts(training$Close)
+test.ts  <- ts(testing$Close)
 ```
 
+## Eksplorasi Data
 
+```{r}
+plot(train.ts, col="blue",main="Plot data latih")
+points(train.ts)
+```
+
+```{r}
+plot(test.ts, col="red",main="Plot data uji")
+points(test.ts)
+```
+
+```{r}
+ggplot() + 
+  geom_line(data = training, aes(x = Date, y = Close, col = "Data Latih")) +
+  geom_line(data = testing, aes(x = Date, y = Close, col = "Data Uji")) +
+  labs(x = "Time", y = "Daily Close", color = "Legend") +
+  scale_colour_manual(name="Keterangan:", breaks = c("Data Latih", "Data Uji"),
+                      values = c("blue", "red")) + 
+  theme_bw() + theme(legend.position = "bottom",
+                     plot.caption = element_text(hjust=0.5, size=12))
+```
 
 
 
