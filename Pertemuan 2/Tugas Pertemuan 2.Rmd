@@ -260,9 +260,20 @@ ggplot() +
                      plot.caption = element_text(hjust=0.5, size=12))
 ```
 
+## Single Exponential Smoothing
 
+```{r}
+ses.1 <- ses(train.ts, h = 30, alpha = 0.2)
+plot(ses.1)
+```
 
+```{r}
+ses.1
+```
 
-
+```{r}
+ses.2<- ses(train.ts, h = 30, alpha = 0.7)
+plot(ses.2)
+```
 
 
