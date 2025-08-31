@@ -1,1 +1,237 @@
+---
+title: "Latihan 2 MPDW"
+author: "Wiska Radhia Firdaus - G1401231017"
+date: "2025-08-31"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Library
+
+```{r}
+library(forecast)
+library(graphics)
+library(TTR)
+library(TSA)
+library(rio)
+library(ggplot2)
+```
+
+# Import Data
+
+```{r}
+data <- read.csv("D:\\File\\Data Science\\Semester 5\\MPDW\\Data MPDW Kelompok 1.csv")
+df <- data[126:250, ]
+df
+```
+
+# Eksplorasi Data
+
+```{r}
+View(df)
+str(df)
+```
+
+```{r}
+df$Date <- as.Date(df$Date, format = "%Y-%m-%d")
+str(df)
+```
+
+
+```{r}
+dim(df)
+```
+
+```{r}
+df.ts <- ts(df$Close)
+```
+
+```{r}
+summary(df.ts)
+```
+
+```{r}
+ts.plot(df.ts, xlab="Time Period ", ylab="Reading", 
+        main = "Time Series Plot")
+points(df.ts)
+```
+
+# Single Moving Average & Double Moving Average
+## Pembagian Data
+
+```{r}
+n <- nrow(df)
+
+n_train <- floor(0.8 * n)
+
+training_ma <- df[1:n_train, ]
+testing_ma  <- df[(n_train+1):n, ]
+
+train_ma.ts <- ts(training_ma$Close)
+test_ma.ts  <- ts(testing_ma$Close)
+```
+
+```{r}
+plot(df.ts, col="grey",main="Plot semua data")
+points(df.ts)
+```
+
+```{r}
+plot(train_ma.ts, col="blue",main="Plot data latih")
+points(train_ma.ts)
+```
+
+```{r}
+plot(test_ma.ts, col="red",main="Plot data uji")
+points(test_ma.ts)
+```
+
+```{r}
+ggplot() + 
+  geom_line(data = training_ma, aes(x = Date, y = Close, col = "Data Latih")) +
+  geom_line(data = testing_ma, aes(x = Date, y = Close, col = "Data Uji")) +
+  labs(x = "Time", y = "Daily Close", color = "Legend") +
+   scale_colour_manual(name="Keterangan:", breaks = c("Data Latih", "Data Uji"),
+                      values = c("blue", "red")) + 
+  theme_bw() + theme(legend.position = "bottom",
+                     plot.caption = element_text(hjust=0.5, size=12))
+```
+
+## Single Moving Average (SMA)
+
+```{r}
+df.sma<-SMA(train_ma.ts, n=5)
+df.sma
+```
+
+```{r}
+df.ramal<-c(NA,df.sma)
+df.ramal
+```
+
+```{r}
+df.gab <- cbind(
+  aktual = c(df.ts),
+  pemulusan = c(df.sma,rep(NA,25)),
+  ramalan = c(df.ramal,rep(df.ramal[length(df.ramal)],24)))
+
+df.gab
+```
+
+```{r}
+ts.plot(df.ts, xlab="Time", ylab="Daily Close", main= "SMA N=5 Data Daily Close")
+points(df.ts)
+lines(df.gab[,2],col="blue",lwd=3)
+lines(df.gab[,3],col="orange",lwd=3)
+legend("topleft",c("data aktual","data pemulusan","data peramalan"), lty=8, col=c("black","blue","orange"), cex=0.5)
+```
+
+```{r}
+error_train.sma = train_ma.ts-df.ramal[1:length(train_ma.ts)]
+
+SSE_train.sma = sum(error_train.sma[6:length(train_ma.ts)]^2)
+MSE_train.sma = mean(error_train.sma[6:length(train_ma.ts)]^2)
+MAPE_train.sma = mean(abs((error_train.sma[6:length(train_ma.ts)]/train_ma.ts[6:length(train_ma.ts)])*100))
+
+akurasi_train.sma <- matrix(c(SSE_train.sma, MSE_train.sma, MAPE_train.sma))
+row.names(akurasi_train.sma)<- c("SSE", "MSE", "MAPE")
+colnames(akurasi_train.sma) <- c("Akurasi m = 5")
+akurasi_train.sma
+```
+
+Dalam hal ini nilai MAPE data latih pada metode pemulusan SMA sekitar 6,5%, nilai ini dapat dikategorikan sebagai nilai akurasi yang cukup baik. Selanjutnya dilakukan perhitungan nilai MAPE data uji pada metode pemulusan SMA.
+
+```{r}
+error_test.sma = test_ma.ts-df.gab[101:125,3]
+
+SSE_test.sma = sum(error_test.sma^2)
+MSE_test.sma = mean(error_test.sma^2)
+MAPE_test.sma = mean(abs((error_test.sma/test_ma.ts*100)))
+
+akurasi_test.sma <- matrix(c(SSE_test.sma, MSE_test.sma, MAPE_test.sma))
+row.names(akurasi_test.sma)<- c("SSE", "MSE", "MAPE")
+colnames(akurasi_test.sma) <- c("Akurasi m = 5")
+akurasi_test.sma
+```
+
+Perhitungan akurasi menggunakan data latih menghasilkan nilai MAPE yang lebih dari 10% sehingga nilai akurasi ini dapat dikategorikan kurang baik.
+
+## Double Moving Average (DMA)
+
+```{r}
+dma <- SMA(df.sma, n = 5)
+At <- 2*df.sma - dma
+Bt <- 2/(5-1)*(df.sma - dma)
+df.dma <- At+Bt
+df.ramal2 <- c(NA, df.dma)
+
+t = 1:25
+f = c()
+
+for (i in t) {
+  f[i] = At[length(At)] + Bt[length(Bt)]*(i)
+}
+
+df.gab2 <- cbind(aktual = c(df.ts), 
+                   pemulusan1 = c(df.sma,rep(NA,25)),
+                   pemulusan2 = c(dma, rep(NA,25)),
+                   At = c(At, rep(NA,25)), 
+                   Bt = c(Bt,rep(NA,25)),
+                   ramalan = c(df.ramal2, f[-1]))
+df.gab2
+```
+
+```{r}
+ts.plot(df.ts, xlab="Time", ylab="Daily Close", main= "DMA N=5 Data Daily Close")
+points(df.ts)
+lines(df.gab2[,3],col="blue",lwd=2)
+lines(df.gab2[,6],col="orange",lwd=2)
+legend("topleft",c("data aktual","data pemulusan","data peramalan"), lty=8, col=c("black","blue","orange"), cex=0.8)
+```
+
+```{r}
+error_train.dma = train_ma.ts-df.ramal2[1:length(train_ma.ts)]
+
+SSE_train.dma = sum(error_train.dma[10:length(train_ma.ts)]^2)
+MSE_train.dma = mean(error_train.dma[10:length(train_ma.ts)]^2)
+MAPE_train.dma = mean(abs((error_train.dma[10:length(train_ma.ts)]/train_ma.ts[10:length(train_ma.ts)])*100))
+
+akurasi_train.dma <- matrix(c(SSE_train.dma, MSE_train.dma, MAPE_train.dma))
+row.names(akurasi_train.dma)<- c("SSE", "MSE", "MAPE")
+colnames(akurasi_train.dma) <- c("Akurasi m = 5")
+akurasi_train.dma
+```
+
+Perhitungan akurasi pada data latih menggunakan nilai MAPE menghasilkan nilai MAPE yang kurang dari 10% sehingga dikategorikan sangat baik. Selanjutnya, perhitungan nilai akurasi dilakukan pada data uji.
+
+```{r}
+error_test.dma = test_ma.ts-df.gab2[101:125,6]
+SSE_test.dma = sum(error_test.dma^2)
+MSE_test.dma = mean(error_test.dma^2)
+MAPE_test.dma = mean(abs((error_test.dma/test_ma.ts*100)))
+
+akurasi_test.dma <- matrix(c(SSE_test.dma, MSE_test.dma, MAPE_test.dma))
+row.names(akurasi_test.dma)<- c("SSE", "MSE", "MAPE")
+colnames(akurasi_test.dma) <- c("Akurasi m = 5")
+akurasi_test.dma
+```
+
+Perhitungan akurasi menggunakan data latih menghasilkan nilai MAPE yang lebih dari 10% sehingga nilai akurasi ini dapat dikategorikan kurang baik.
+
+Pada data latih, metode DMA lebih baik dibandingkan dengan metode SMA, sedangkan pada data uji, metode SMA lebih baik dibandingkan DMA.
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
 
