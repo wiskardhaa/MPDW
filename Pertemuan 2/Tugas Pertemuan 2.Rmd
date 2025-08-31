@@ -276,4 +276,249 @@ ses.2<- ses(train.ts, h = 30, alpha = 0.7)
 plot(ses.2)
 ```
 
+```{r}
+ses.2
+```
 
+```{r}
+autoplot(ses.1) +
+  autolayer(fitted(ses.1), series="Fitted") +
+  ylab("Daily Close") + xlab("Time")
+```
+
+```{r}
+ses1<- HoltWinters(train.ts, gamma = FALSE, beta = FALSE, alpha = 0.2)
+plot(ses1)
+```
+
+```{r}
+ramalan1<- forecast(ses1, h=30)
+ramalan1
+```
+
+```{r}
+ses2<- HoltWinters(train.ts, gamma = FALSE, beta = FALSE, alpha = 0.7)
+plot(ses2)
+```
+
+```{r}
+ramalan2<- forecast(ses2, h=30)
+ramalan2
+```
+
+```{r}
+ses.opt <- ses(train.ts, h = 30, alpha = NULL)
+plot(ses.opt)
+```
+
+```{r}
+ses.opt
+```
+
+```{r}
+HWopt<- HoltWinters(train.ts, gamma = FALSE, beta = FALSE,alpha = NULL)
+HWopt
+```
+
+```{r}
+plot(HWopt)
+```
+
+```{r}
+ramalanopt<- forecast(HWopt, h=30)
+ramalanopt
+```
+
+### Akurasi Data Training
+
+```{r}
+SSE1<-ses1$SSE
+MSE1<-ses1$SSE/length(train.ts)
+RMSE1<-sqrt(MSE1)
+
+akurasi1 <- matrix(c(SSE1,MSE1,RMSE1))
+row.names(akurasi1)<- c("SSE", "MSE", "RMSE")
+colnames(akurasi1) <- c("Akurasi lamda=0.2")
+akurasi1
+```
+
+```{r}
+SSE2<-ses2$SSE
+MSE2<-ses2$SSE/length(train.ts)
+RMSE2<-sqrt(MSE2)
+
+akurasi2 <- matrix(c(SSE2,MSE2,RMSE2))
+row.names(akurasi2)<- c("SSE", "MSE", "RMSE")
+colnames(akurasi2) <- c("Akurasi lamda=0.7")
+akurasi2
+```
+
+Berdasarkan nilai SSE, MSE, RMSE, dan MAPE di antara kedua parameter, nilai parameter $λ=0,7$ menghasilkan akurasi yang lebih baik dibanding $λ=0,2$. Hal ini dilihat dari nilai masing-masing ukuran akurasi yang lebih kecil. Berdasarkan nilai MAPE-nya, hasil ini dapat dikategorikan sebagai peramalan sangat baik.
+
+### Akurasi Data Testing
+
+```{r}
+n_test <- nrow(testing)
+
+e1   <- as.numeric(ramalan1$mean)[1:n_test] - as.numeric(testing$Close)
+e2   <- as.numeric(ramalan2$mean)[1:n_test] - as.numeric(testing$Close)
+eopt <- as.numeric(ramalanopt$mean)[1:n_test] - as.numeric(testing$Close)
+
+SSEtesting1  <- sum(e1^2,  na.rm = TRUE)
+MSEtesting1  <- mean(e1^2, na.rm = TRUE)
+RMSEtesting1 <- sqrt(MSEtesting1)
+
+SSEtesting2  <- sum(e2^2,  na.rm = TRUE)
+MSEtesting2  <- mean(e2^2, na.rm = TRUE)
+RMSEtesting2 <- sqrt(MSEtesting2)
+
+SSEtestingopt  <- sum(eopt^2,  na.rm = TRUE)
+MSEtestingopt  <- mean(eopt^2, na.rm = TRUE)
+RMSEtestingopt <- sqrt(MSEtestingopt)
+
+akurasitesting_SSE <- matrix(c(SSEtesting1, SSEtesting2, SSEtestingopt),
+                             nrow = 3,
+                             dimnames = list(c("SSE1","SSE2","SSEopt"), "Nilai"))
+akurasitesting_MSE <- matrix(c(MSEtesting1, MSEtesting2, MSEtestingopt),
+                             nrow = 3,
+                             dimnames = list(c("MSE1","MSE2","MSEopt"), "Nilai"))
+akurasitesting_RMSE <- matrix(c(RMSEtesting1, RMSEtesting2, RMSEtestingopt),
+                              nrow = 3,
+                              dimnames = list(c("RMSE1","RMSE2","RMSEopt"), "Nilai"))
+
+akurasitesting_SSE
+akurasitesting_MSE
+akurasitesting_RMSE
+```
+
+Berdasarkan nilai SSE, MSE, RMSE, dan MAPE di antara ketiga parameter, sesuai yang diharapkan bahwa nilai parameter $λ=Null$ menghasilkan akurasi yang lebih baik dibanding $λ=0,2$ dan $λ=0,7$ karena dioptimalkan dapat menyesuaikan dari \textit{error}-nya yang paling minimum. Hal ini dilihat dari nilai masing-masing ukuran akurasi yang lebih kecil. Berdasarkan nilai MAPE-nya, hasil ini dapat dikategorikan sebagai peramalan sangat baik.
+
+## Double Exponential Smoothing (DES)
+
+```{r}
+des.1<- HoltWinters(train.ts, gamma = FALSE, beta = 0.2, alpha = 0.2)
+plot(des.1)
+```
+
+```{r}
+ramalandes1<- forecast(des.1, h=30)
+ramalandes1
+```
+
+```{r}
+des.2<- HoltWinters(train.ts, gamma = FALSE, beta = 0.3, alpha = 0.6)
+plot(des.2)
+```
+
+```{r}
+ramalandes2<- forecast(des.2, h=30)
+ramalandes2
+```
+
+```{r}
+plot(df.ts)
+lines(des.1$fitted[,1], lty=2, col="blue")
+lines(ramalandes1$mean, col="red")
+```
+
+```{r}
+des.opt<- HoltWinters(train.ts, gamma = FALSE)
+des.opt
+```
+
+```{r}
+plot(des.opt)
+```
+
+```{r}
+ramalandesopt<- forecast(des.opt, h=30)
+ramalandesopt
+```
+
+### Akurasi Data Training
+
+```{r}
+ssedes.train1<-des.1$SSE
+msedes.train1<-ssedes.train1/length(train.ts)
+sisaandes1<-ramalandes1$residuals
+head(sisaandes1)
+```
+
+```{r}
+mapedes.train1 <- sum(abs(sisaandes1[3:length(train.ts)]/train.ts[3:length(train.ts)])
+                      *100)/length(train.ts)
+
+akurasides.1 <- matrix(c(ssedes.train1,msedes.train1,mapedes.train1))
+row.names(akurasides.1)<- c("SSE", "MSE", "MAPE")
+colnames(akurasides.1) <- c("Akurasi lamda=0.2 dan gamma=0.2")
+akurasides.1
+```
+
+```{r}
+ssedes.train2<-des.2$SSE
+msedes.train2<-ssedes.train2/length(train.ts)
+sisaandes2<-ramalandes2$residuals
+head(sisaandes2)
+```
+
+```{r}
+mapedes.train2 <- sum(abs(sisaandes2[3:length(train.ts)]/train.ts[3:length(train.ts)])
+                      *100)/length(train.ts)
+
+akurasides.2 <- matrix(c(ssedes.train2,msedes.train2,mapedes.train2))
+row.names(akurasides.2)<- c("SSE", "MSE", "MAPE")
+colnames(akurasides.2) <- c("Akurasi lamda=0.6 dan gamma=0.3")
+akurasides.2
+```
+
+Hasil akurasi dari data training didapatkan skenario 2 dengan $λ=0,6$ dan $\gamma = 0,3$ memiliki hasil yang baik. Meskipun begitu, untuk kedua skenario dapat dikategorikan peramalan yang sangat baik karena memiliki nilai MAPE yang kurang dari 10%
+
+### Akurasi Data Testing
+
+```{r}
+selisihdes1<-ramalandes1$mean-testing$Close
+selisihdes1
+```
+
+```{r}
+SSEtestingdes1<-sum(selisihdes1^2)
+MSEtestingdes1<-SSEtestingdes1/length(testing$Close)
+MAPEtestingdes1<-sum(abs(selisihdes1/testing$Close)*100)/length(testing$Close)
+
+selisihdes2<-ramalandes2$mean-testing$Close
+selisihdes2
+```
+
+```{r}
+SSEtestingdes2<-sum(selisihdes2^2)
+MSEtestingdes2<-SSEtestingdes2/length(testing$Close)
+MAPEtestingdes2<-sum(abs(selisihdes2/testing$Close)*100)/length(testing$Close)
+
+selisihdesopt<-ramalandesopt$mean-testing$Close
+selisihdesopt
+```
+
+```{r}
+SSEtestingdesopt<-sum(selisihdesopt^2)
+MSEtestingdesopt<-SSEtestingdesopt/length(testing$Close)
+MAPEtestingdesopt<-sum(abs(selisihdesopt/testing$Close)*100)/length(testing$Close)
+
+akurasitestingdes <-
+  matrix(c(SSEtestingdes1,MSEtestingdes1,MAPEtestingdes1,SSEtestingdes2,MSEtestingdes2,
+           MAPEtestingdes2,SSEtestingdesopt,MSEtestingdesopt,MAPEtestingdesopt),
+         nrow=3,ncol=3)
+row.names(akurasitestingdes)<- c("SSE", "MSE", "MAPE")
+colnames(akurasitestingdes) <- c("des ske1","des ske2","des opt")
+akurasitestingdes
+```
+
+```{r}
+MSEfull <-
+  matrix(c(MSEtesting1,MSEtesting2,MSEtestingopt,MSEtestingdes1,MSEtestingdes2,
+           MSEtestingdesopt),nrow=3,ncol=2)
+row.names(MSEfull)<- c("ske 1", "ske 2", "ske opt")
+colnames(MSEfull) <- c("ses","des")
+MSEfull
+```
+
+Model DES lebih baik daripada model SES karena menghasilkan nilai MSE yang jauh lebih kecil pada dua skenario. Artinya, data testing tersebut cenderung memiliki tren sehingga \textit{Double Exponential Smoothing} lebih tepat dibandingkan \textit{Single Exponential Smoothing}
