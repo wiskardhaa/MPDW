@@ -31,7 +31,6 @@ df
 # Eksplorasi Data
 
 ```{r}
-View(df)
 str(df)
 ```
 
@@ -54,8 +53,8 @@ summary(df.ts)
 ```
 
 ```{r}
-ts.plot(df.ts, xlab="Time Period ", ylab="Reading", 
-        main = "Time Series Plot")
+ts.plot(df.ts, xlab="Periode", ylab="Harga (Rp)", 
+        main = "Harga Saham Tf Harian BREN")
 points(df.ts)
 ```
 
@@ -93,7 +92,7 @@ points(test_ma.ts)
 ggplot() + 
   geom_line(data = training_ma, aes(x = Date, y = Close, col = "Data Latih")) +
   geom_line(data = testing_ma, aes(x = Date, y = Close, col = "Data Uji")) +
-  labs(x = "Time", y = "Daily Close", color = "Legend") +
+  labs(x = "Periode", y = "Harga (Rp)", color = "Legend") +
    scale_colour_manual(name="Keterangan:", breaks = c("Data Latih", "Data Uji"),
                       values = c("blue", "red")) + 
   theme_bw() + theme(legend.position = "bottom",
@@ -122,7 +121,7 @@ df.gab
 ```
 
 ```{r}
-ts.plot(df.ts, xlab="Time", ylab="Daily Close", main= "SMA N=5 Data Daily Close")
+ts.plot(df.ts, xlab="Periode", ylab="Harga (Rp)", main= "SMA N=5 Data Daily Close")
 points(df.ts)
 lines(df.gab[,2],col="blue",lwd=3)
 lines(df.gab[,3],col="orange",lwd=3)
@@ -185,7 +184,7 @@ df.gab2
 ```
 
 ```{r}
-ts.plot(df.ts, xlab="Time", ylab="Daily Close", main= "DMA N=5 Data Daily Close")
+ts.plot(df.ts, xlab="Periode", ylab="Harga (Rp)", main= "DMA N=5 Data Daily Close")
 points(df.ts)
 lines(df.gab2[,3],col="blue",lwd=2)
 lines(df.gab2[,6],col="orange",lwd=2)
@@ -253,7 +252,7 @@ points(test.ts)
 ggplot() + 
   geom_line(data = training, aes(x = Date, y = Close, col = "Data Latih")) +
   geom_line(data = testing, aes(x = Date, y = Close, col = "Data Uji")) +
-  labs(x = "Time", y = "Daily Close", color = "Legend") +
+  labs(x = "Periode", y = "Harga (Rp)", color = "Legend") +
   scale_colour_manual(name="Keterangan:", breaks = c("Data Latih", "Data Uji"),
                       values = c("blue", "red")) + 
   theme_bw() + theme(legend.position = "bottom",
