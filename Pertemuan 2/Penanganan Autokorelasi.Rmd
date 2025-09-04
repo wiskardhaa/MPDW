@@ -1,1 +1,296 @@
+---
+title: "Penanganan Autokorelasi"
+author: "Wiska Radhia Firdaus"
+date: "2025-09-01"
+output: html_document
+---
+
+# Library & Input Data
+
+```{r}
+library(readxl)
+library(TTR)
+library(forecast)
+
+df <- read_excel("C:\\Users\\MyBook Z Series\\Downloads\\IPM BALI.xlsx")
+df <- as.data.frame(df)
+df
+```
+
+# Eksplorasi Data
+
+```{r}
+data.ts <- ts(df$IPM)
+data.ts
+```
+
+```{r}
+ts.plot(data.ts, xlab="Time Period ", ylab="IPM", main= "Time Series Plot of IPM")
+points(data.ts)
+```
+
+```{r}
+dt.sma <- SMA(data.ts, n=3)
+dma <- SMA(dt.sma, n = 3)
+At <- 2*dt.sma - dma
+Bt <- 2/(3-1)*(dt.sma - dma)
+dt.dma<- At+Bt
+dt.ramal<- c(NA, dt.dma)
+
+t = 1:5
+f = c()
+
+for (i in t) {
+  f[i] = At[length(At)] + Bt[length(Bt)]*(i)
+}
+```
+
+```{r}
+dt.gab <- cbind(aktual = c(data.ts,rep(NA,5)), 
+                pemulusan1 = c(dt.sma,rep(NA,5)),
+                pemulusan2 = c(dt.dma, rep(NA,5)),
+                At = c(At, rep(NA,5)), 
+                Bt = c(Bt,rep(NA,5)),
+                ramalan = c(dt.ramal, f[-1]))
+dt.gab
+```
+
+```{r}
+ts.plot(dt.gab[,1], xlab="Time Period ", ylab="IPM", 
+        main= "DMA N=3 Data IPM", ylim=c(70,85))
+points(dt.gab[,1])
+points(dt.gab[,3])
+points(dt.gab[,6])
+lines(dt.gab[,3],col="green",lwd=3)
+lines(dt.gab[,6],col="red",lwd=3)
+legend("topleft",c("data aktual","data pemulusan","data peramalan"), 
+       lty=8, col=c("black","green","red"), cex=0.8)
+```
+
+```{r}
+error.dma = data.ts-dt.ramal[1:length(data.ts)]
+SSE.dma = sum(error.dma[6:length(data.ts)]^2)
+MSE.dma = mean(error.dma[6:length(data.ts)]^2)
+MAPE.dma = mean(abs((error.dma[6:length(data.ts)]/data.ts[6:length(data.ts)])*100))
+
+akurasi.dma <- matrix(c(SSE.dma, MSE.dma, MAPE.dma))
+row.names(akurasi.dma)<- c("SSE", "MSE", "MAPE")
+colnames(akurasi.dma) <- c("Akurasi m = 3")
+akurasi.dma
+```
+
+```{r}
+training <- df[1:12,2]
+testing <- df[13:15,2]
+
+training.ts<-ts(training)
+testing.ts<-ts(testing,start=11)
+
+plot(data.ts, col="red",main="Plot semua data")
+points(data.ts)
+```
+
+```{r}
+plot(training.ts, col="blue",main="Plot data training")
+points(training.ts)
+```
+
+```{r}
+des.opt <- HoltWinters(training.ts, gamma = FALSE)
+des.opt
+```
+
+```{r}
+plot(des.opt)
+legend("topleft", c("Data Aktual", "Peramalan"), col = c("black", "red"), 
+       lty = c(1,1))
+```
+
+```{r}
+ramalandesopt <- forecast(des.opt, h=8)
+ramalandesopt
+```
+
+```{r}
+ssedes.train<-des.opt$SSE
+msedes.train<-ssedes.train/length(training.ts)
+sisaandes<-ramalandesopt$residuals
+head(sisaandes)
+```
+
+```{r}
+mapedes.train <- sum(abs(sisaandes[3:length(training.ts)]/training.ts[3:length(training.ts)])*100)/length(training.ts)
+
+akurasides.opt <- matrix(c(ssedes.train,msedes.train,mapedes.train))
+row.names(akurasides.opt)<- c("SSE", "MSE", "MAPE")
+colnames(akurasides.opt) <- c("Akurasi lamda dan gamma optimum")
+akurasides.opt
+```
+
+```{r}
+selisihdesopt<-ramalandesopt$mean-testing.ts
+selisihdesopt
+```
+
+```{r}
+SSEtestingdesopt<-sum(selisihdesopt^2)
+SSEtestingdesopt<-SSEtestingdesopt/length(testing.ts)
+MAPEtestingdesopt<-sum(abs(selisihdesopt/testing.ts)*100)/length(testing.ts)
+
+akurasiDesTesting <- matrix(c(SSEtestingdesopt,SSEtestingdesopt,MAPEtestingdesopt))
+row.names(akurasiDesTesting)<- c("SSE", "MSE", "MAPE")
+colnames(akurasiDesTesting) <- c("Akurasi lamda dan gamma optimum")
+akurasiDesTesting
+```
+
+```{r}
+cbind(akurasi.dma, akurasides.opt)
+```
+
+```{r}
+plot(df, pch = 20, col = "blue",
+     main = "Scatter Plot Tahun vs Nilai IPM",
+     xlab = "Tahun",
+     ylab = "Nilai IPM")
+```
+
+```{r}
+cor(df)
+```
+
+```{r}
+model <- lm(formula = IPM ~ Tahun, data = df)
+summary(model)
+```
+
+```{r}
+sisaan<- residuals(model)
+fitValue<- predict(model)
+
+par(mfrow = c(2,2))
+qqnorm(sisaan)
+qqline(sisaan, col = "steelblue", lwd = 2)
+plot(fitValue, sisaan, col = "steelblue", pch = 20, xlab = "Sisaan", ylab = "Fitted Values", main = "Sisaan vs Fitted Values")
+abline(a = 0, b = 0, lwd = 2)
+hist(sisaan, col = "steelblue")
+plot(seq(1,15,1), sisaan, col = "steelblue", pch = 20, xlab = "Sisaan", ylab = "Order", main = "Sisaan vs Order")
+lines(seq(1,15,1), sisaan, col = "red")
+abline(a = 0, b = 0, lwd = 2)
+```
+
+```{r}
+shapiro.test(sisaan)
+```
+
+```{r}
+ks.test(sisaan, "pnorm", mean=mean(sisaan), sd=sd(sisaan))
+```
+
+```{r}
+par(mfrow = c(1,2))
+acf(sisaan)
+pacf(sisaan)
+```
+
+```{r}
+library(lmtest)
+dwtest(model)
+```
+
+```{r}
+library(orcutt)
+modelCO <- cochrane.orcutt(model)
+modelCO
+```
+
+```{r}
+rho <- modelCO$rho
+rho
+```
+
+```{r}
+df$IPM
+```
+
+```{r}
+df$IPM[-1]
+```
+
+```{r}
+ipm.trans<- df$IPM[-1]-df$IPM[-12]*rho
+tahun.trans<- df$Tahun[-1]-df$Tahun[-12]*rho
+modelCOmanual<- lm(ipm.trans~tahun.trans)
+summary(modelCOmanual)
+```
+
+```{r}
+b0bintang <- modelCOmanual$coefficients[-2]
+b0 <- b0bintang/(1-rho)
+b1 <- modelCOmanual$coefficients[-1]
+b0
+```
+
+```{r}
+b1
+```
+
+```{r}
+hildreth.lu.func<- function(r, model){
+  x <- model.matrix(model)[,-1]
+  y <- model.response(model.frame(model))
+  n <- length(y)
+  t <- 2:n
+  y <- y[t]-r*y[t-1]
+  x <- x[t]-r*x[t-1]
+  
+  return(lm(y~x))
+}
+
+r <- c(seq(0.1,0.9, by= 0.1))
+tab <- data.frame("rho" = r, "SSE" = sapply(r, function(i){deviance(hildreth.lu.func(i, model))}))
+round(tab, 4)
+```
+
+```{r}
+rOpt <- seq(0.2,0.5, by= 0.001)
+tabOpt <- data.frame("rho" = rOpt, "SSE" = sapply(rOpt, function(i){deviance(hildreth.lu.func(i, model))}))
+head(tabOpt[order(tabOpt$SSE),])
+```
+
+```{r}
+par(mfrow = c(1,1))
+plot(tab$SSE ~ tab$rho , type = "l", xlab = "Rho", ylab = "SSE")
+abline(v = tabOpt[tabOpt$SSE==min(tabOpt$SSE),"rho"], lty = 2, col="red",lwd=2)
+text(x=0.416, y=0.3649678, labels = "rho=0.416", cex = 0.8)
+```
+
+```{r}
+library(HoRM)
+modelHL <- hildreth.lu.func(0.416, model)
+summary(modelHL)
+```
+
+```{r}
+cat("y = ", coef(modelHL)[1]/(1-0.416), "+", coef(modelHL)[2],"x", sep = "")
+```
+
+```{r}
+dwtest(modelHL)
+```
+
+```{r}
+sseModelawal <- anova(model)$`Sum Sq`[-1]
+sseModelCO <- anova(modelCOmanual)$`Sum Sq`[-1]
+sseModelHL <- anova(modelHL)$`Sum Sq`[-1]
+mseModelawal <- sseModelawal/length(df$IPM)
+mseModelCO <- sseModelCO/length(df$IPM)
+mseModelHL <- sseModelHL/length(df$IPM)
+akurasi <- matrix(c(sseModelawal,sseModelCO,sseModelHL,
+                    mseModelawal,mseModelCO,mseModelHL),nrow=2,ncol=3,byrow = T)
+colnames(akurasi) <- c("Model Awal", "Model Cochrane-Orcutt", "Model Hildreth-Lu")
+row.names(akurasi) <- c("SSE","MSE")
+akurasi
+```
+
+# Simpulan
 
