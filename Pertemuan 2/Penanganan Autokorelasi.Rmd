@@ -17,6 +17,8 @@ df <- as.data.frame(df)
 df
 ```
 
+Data yang digunakan adalah data IPM Provinsi Bali Tahun 2010 hingga 2024.
+
 # Eksplorasi Data
 
 ```{r}
@@ -29,139 +31,16 @@ ts.plot(data.ts, xlab="Time Period ", ylab="IPM", main= "Time Series Plot of IPM
 points(data.ts)
 ```
 
-```{r}
-dt.sma <- SMA(data.ts, n=3)
-dma <- SMA(dt.sma, n = 3)
-At <- 2*dt.sma - dma
-Bt <- 2/(3-1)*(dt.sma - dma)
-dt.dma<- At+Bt
-dt.ramal<- c(NA, dt.dma)
+Berikut merupakan plot dari IPM Provinsi Bali yang cenderung berupa tren naik.
 
-t = 1:5
-f = c()
-
-for (i in t) {
-  f[i] = At[length(At)] + Bt[length(Bt)]*(i)
-}
-```
-
-```{r}
-dt.gab <- cbind(aktual = c(data.ts,rep(NA,5)), 
-                pemulusan1 = c(dt.sma,rep(NA,5)),
-                pemulusan2 = c(dt.dma, rep(NA,5)),
-                At = c(At, rep(NA,5)), 
-                Bt = c(Bt,rep(NA,5)),
-                ramalan = c(dt.ramal, f[-1]))
-dt.gab
-```
-
-```{r}
-ts.plot(dt.gab[,1], xlab="Time Period ", ylab="IPM", 
-        main= "DMA N=3 Data IPM", ylim=c(70,85))
-points(dt.gab[,1])
-points(dt.gab[,3])
-points(dt.gab[,6])
-lines(dt.gab[,3],col="green",lwd=3)
-lines(dt.gab[,6],col="red",lwd=3)
-legend("topleft",c("data aktual","data pemulusan","data peramalan"), 
-       lty=8, col=c("black","green","red"), cex=0.8)
-```
-
-```{r}
-error.dma = data.ts-dt.ramal[1:length(data.ts)]
-SSE.dma = sum(error.dma[6:length(data.ts)]^2)
-MSE.dma = mean(error.dma[6:length(data.ts)]^2)
-MAPE.dma = mean(abs((error.dma[6:length(data.ts)]/data.ts[6:length(data.ts)])*100))
-
-akurasi.dma <- matrix(c(SSE.dma, MSE.dma, MAPE.dma))
-row.names(akurasi.dma)<- c("SSE", "MSE", "MAPE")
-colnames(akurasi.dma) <- c("Akurasi m = 3")
-akurasi.dma
-```
-
-```{r}
-training <- df[1:12,2]
-testing <- df[13:15,2]
-
-training.ts<-ts(training)
-testing.ts<-ts(testing,start=11)
-
-plot(data.ts, col="red",main="Plot semua data")
-points(data.ts)
-```
-
-```{r}
-plot(training.ts, col="blue",main="Plot data training")
-points(training.ts)
-```
-
-```{r}
-des.opt <- HoltWinters(training.ts, gamma = FALSE)
-des.opt
-```
-
-```{r}
-plot(des.opt)
-legend("topleft", c("Data Aktual", "Peramalan"), col = c("black", "red"), 
-       lty = c(1,1))
-```
-
-```{r}
-ramalandesopt <- forecast(des.opt, h=8)
-ramalandesopt
-```
-
-```{r}
-ssedes.train<-des.opt$SSE
-msedes.train<-ssedes.train/length(training.ts)
-sisaandes<-ramalandesopt$residuals
-head(sisaandes)
-```
-
-```{r}
-mapedes.train <- sum(abs(sisaandes[3:length(training.ts)]/training.ts[3:length(training.ts)])*100)/length(training.ts)
-
-akurasides.opt <- matrix(c(ssedes.train,msedes.train,mapedes.train))
-row.names(akurasides.opt)<- c("SSE", "MSE", "MAPE")
-colnames(akurasides.opt) <- c("Akurasi lamda dan gamma optimum")
-akurasides.opt
-```
-
-```{r}
-selisihdesopt<-ramalandesopt$mean-testing.ts
-selisihdesopt
-```
-
-```{r}
-SSEtestingdesopt<-sum(selisihdesopt^2)
-SSEtestingdesopt<-SSEtestingdesopt/length(testing.ts)
-MAPEtestingdesopt<-sum(abs(selisihdesopt/testing.ts)*100)/length(testing.ts)
-
-akurasiDesTesting <- matrix(c(SSEtestingdesopt,SSEtestingdesopt,MAPEtestingdesopt))
-row.names(akurasiDesTesting)<- c("SSE", "MSE", "MAPE")
-colnames(akurasiDesTesting) <- c("Akurasi lamda dan gamma optimum")
-akurasiDesTesting
-```
-
-```{r}
-cbind(akurasi.dma, akurasides.opt)
-```
-
-```{r}
-plot(df, pch = 20, col = "blue",
-     main = "Scatter Plot Tahun vs Nilai IPM",
-     xlab = "Tahun",
-     ylab = "Nilai IPM")
-```
-
-```{r}
-cor(df)
-```
+# Regresi
 
 ```{r}
 model <- lm(formula = IPM ~ Tahun, data = df)
 summary(model)
 ```
+
+Pada hasil regresi diatas diperoleh $R^2=0.9912$ sebesar 0.9912 yang artinya sebesar 99.12% keragaman IPM di Provinsi Bali dapat dijelaskan oleh peubah Tahun. Selain itu juga memiliki nilai $\textit{p-value}$ < $\alpha$ (5%) sehingga  nyata dalam taraf 5%. Selanjutnya akan dilakukan uji terhadap sisaannya.
 
 ```{r}
 sisaan<- residuals(model)
@@ -178,6 +57,8 @@ lines(seq(1,15,1), sisaan, col = "red")
 abline(a = 0, b = 0, lwd = 2)
 ```
 
+Pada plot Normal Q-Q Plot dan histogram sisaan terlihat bahwa sisaan cenderung menyebar normal, namun pada histogram terlihat seperti memiliki dua puncak (bimodal). Kemudian pada plot Sisaan vs Fitted Values dan Sisaan vs Order terlihat bahwa sisaan membentuk suatu pola, yang artinya terdapat autokorelasi. Namun, untuk memastikannya akan dilakukan uji formal.
+
 ```{r}
 shapiro.test(sisaan)
 ```
@@ -186,16 +67,25 @@ shapiro.test(sisaan)
 ks.test(sisaan, "pnorm", mean=mean(sisaan), sd=sd(sisaan))
 ```
 
+Berdasarkan uji formal Saphiro-Wilk dan Kolmogorov-Smirnov didapatkan nilai $p-value > α$ (5%). Artinya, cukup bukti untuk menyatakan bahwa sisaan berdistribusi normal.
+
 ```{r}
 par(mfrow = c(1,2))
 acf(sisaan)
 pacf(sisaan)
 ```
 
+Berdasarkan plot ACF dan PACF, terlihat semua dalam rentang batas dan tidak ada lag yang signifikan. Namun, untuk lebih memastikan akan dilakukan uji formal dengan uji Durbin Watson.
+
 ```{r}
 library(lmtest)
 dwtest(model)
 ```
+
+Berdasarkan hasil DW Test, didapatkan nilai $dW=0.94637$ dan $p-value = 0.03741$. Berdasarkan tabel Durbin-Watson diperoleh nilai $dL=1.0770$ dan $dU=1.3605$. Nilai dW berada di bawah nilai dL. Artinya, terdapat autokorelasi positif. Juga dengan nilai $p-value < 0.05$ dapat disimpulkan bahwa tolak H0, cukup bukti mengatakan adanya autokorelasi. Oleh karena itu, diperlukan penangan autokorelasi. Penanganan yang akan digunakan menggunakan dua metode, yaitu Cochrane-Orcutt dan Hildret-Lu.
+
+# Penanganan Autokorelasi
+## Cochrane-Orcutt
 
 ```{r}
 library(orcutt)
@@ -203,36 +93,11 @@ modelCO <- cochrane.orcutt(model)
 modelCO
 ```
 
-```{r}
-rho <- modelCO$rho
-rho
-```
+Hasil keluaran model setelah dilakukan penanganan adalah sebagai berikut.
+$$yi = -924.881530 \ + \ 0.495301$$
+Hasil juga menunjukkan bahwa nilai dW dan $p-value$ meningkat menjadi $1.75467$ dan $0.02092$. Nilai dW sudah berada pada rentang $dU < dW < 4-dU$ atau $1.3605 < dW < 2.6395$. Tetapi pada $p-value$ masih Tolak H0 yang artinya masih terdapat autokorelasi dalam taraf nyata 5% meskipun telah dilakukan penanganan, tetapi dalam taraf nyata 1% sudah tidak ada autokorelasi. Sehingga perlu metode lain untuk melakukan penanganan autokorelasinya. Kita akan melakukan penanganan menggunakan Hildreth-Lu.
 
-```{r}
-df$IPM
-```
-
-```{r}
-df$IPM[-1]
-```
-
-```{r}
-ipm.trans<- df$IPM[-1]-df$IPM[-12]*rho
-tahun.trans<- df$Tahun[-1]-df$Tahun[-12]*rho
-modelCOmanual<- lm(ipm.trans~tahun.trans)
-summary(modelCOmanual)
-```
-
-```{r}
-b0bintang <- modelCOmanual$coefficients[-2]
-b0 <- b0bintang/(1-rho)
-b1 <- modelCOmanual$coefficients[-1]
-b0
-```
-
-```{r}
-b1
-```
+## Hildreth-Lu
 
 ```{r}
 hildreth.lu.func<- function(r, model){
@@ -251,6 +116,8 @@ tab <- data.frame("rho" = r, "SSE" = sapply(r, function(i){deviance(hildreth.lu.
 round(tab, 4)
 ```
 
+Pertama-tama akan dicari di mana kira-kira $ρ$ yang menghasilkan SSE minimum. Pada hasil di atas terlihat $ρ$ minimum ketika 0.4. Namun, hasil tersebut masih kurang teliti sehingga akan dicari kembali $ρ$ yang lebih optimum dengan ketelitian yang lebih. Jika sebelumnya jarak antar $ρ$ yang dicari adalah 0.1, kali ini jarak antar $ρ$ adalah 0.001 dan dilakukan pada selang 0.2 sampai dengan 0.5.
+
 ```{r}
 rOpt <- seq(0.2,0.5, by= 0.001)
 tabOpt <- data.frame("rho" = rOpt, "SSE" = sapply(rOpt, function(i){deviance(hildreth.lu.func(i, model))}))
@@ -261,22 +128,30 @@ head(tabOpt[order(tabOpt$SSE),])
 par(mfrow = c(1,1))
 plot(tab$SSE ~ tab$rho , type = "l", xlab = "Rho", ylab = "SSE")
 abline(v = tabOpt[tabOpt$SSE==min(tabOpt$SSE),"rho"], lty = 2, col="red",lwd=2)
-text(x=0.416, y=0.3649678, labels = "rho=0.416", cex = 0.8)
+text(x=0.413, y=0.3649678, labels = "rho=0.413", cex = 0.8)
 ```
+
+Perhitungan yang dilakukan menunjukkan bahwa nilai $ρ$ optimum, yaitu saat SSE terkecil terdapat pada nilai $ρ=0.413$. Hal tersebut juga ditunjukkan pada plot. Selanjutnya, model dapat didapatkan dengan mengevaluasi nilai $ρ$ ke dalam fungsi Hildreth-Lu, serta dilanjutkan dengan pengujian autokorelasi dengan uji Durbin-Watson. Namun, setelah pengecekan tersebut tidak lupa koefisien regresi tersebut digunakan untuk transformasi balik. Persamaan hasil transformasi itulah yang menjadi persamaan sesungguhnya.
 
 ```{r}
 library(HoRM)
-modelHL <- hildreth.lu.func(0.416, model)
+modelHL <- hildreth.lu.func(0.413, model)
 summary(modelHL)
 ```
 
 ```{r}
-cat("y = ", coef(modelHL)[1]/(1-0.416), "+", coef(modelHL)[2],"x", sep = "")
+cat("y = ", coef(modelHL)[1]/(1-0.413), "+", coef(modelHL)[2],"x", sep = "")
 ```
+
+Setelah dilakukan tranformasi balik, didapatkan model dengan metode Hildreth-Lu sebagai berikut.
+$$yi = -924.9051 \ + \ 0.4953125x_t$$
 
 ```{r}
 dwtest(modelHL)
 ```
+
+Hasil uji Durbin-Watson menunjukkan bawah nilai dW sebesar 1.7541 berada pada selang daerah tidak ada autokorelasi, yaitu pada rentang $dU < dW < 4-dU$ atau $1.3605 < dW < 2.6395$. Hal tersebut juga didukung oleh $p-value$ sebesar $0.2089$, di mana $p-value > α$ = 5%. Artinya tak Tolak H0 atau belum cukup bukti menyatakan bahwa ada autokorelasi dalam data nilai IPM Provinsi Bali dengan metode Hildreth-Lu pada taraf nyata 5%.
+Terakhir, akan dibandingkan nilai SSE dari ketiga metode (metode awal, metode Cochrane-Orcutt, dan Hildreth-Lu).
 
 ```{r}
 sseModelawal <- anova(model)$`Sum Sq`[-1]
@@ -292,5 +167,8 @@ row.names(akurasi) <- c("SSE","MSE")
 akurasi
 ```
 
+Berdasarkan hasil tersebut dapat diketahui bahwa hasil penanganan autokorelasi dengan metode Cochrane-Orcutt memiliki SSE yang lebih kecil dari Hildreth-Lu, sebesar $0.34267474 < 0.36496366$, meskipun begitu, masih lebih baik dibandingkan model awal ketika autokorelasi masih terjadi, yaitu sebesar $0.65611857$.
+
 # Simpulan
 
+Autokorelasi yang terdapat pada data IPM Provinsi Bali terjadi akibat adanya korelasi di antara unsur penyusunnya. Indikator IPM yang erat hubungannya dengan perekonomian sangat rawan menjadi penyebab adanya autokorelasi. Adanya autokorelasi menyebabkan model regresi kurang baik karena akan meingkatkan galatnya. Autokorelasi dapat dideteksi secara eksploratif melalui plot sisaan, ACF, dan PACF, serta dengan uji formal Durbin-Watson. Namun, autokorelasi tersebut dapat ditangani dengan metode Cochrane-Orcutt dan Hildreth-Lu, meskipun pada taraf nyata 5% hanya Hildreth-Lu yang berhasil menangani autokorelasi, Cochrane-Orcutt tidak berhasil menangani autokorelasi pada taraf nyata 5%, melainkan pada taraf nyata 1%. Kedua metode menghasilkan nilai SSE yang berbeda, dimana nilai SSE dari Cochrane-Orcutt lebih kecil dibandingkan Hildreth-Lu. Tetapi, yang baik digunakan dengan taraf nyata 5% adalah metode Hildreth-Lu karena berhasil menangani autokorelasi dibandingkan Cochrane-Orcutt. 
