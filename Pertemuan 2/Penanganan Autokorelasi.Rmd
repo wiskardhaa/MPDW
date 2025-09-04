@@ -97,6 +97,39 @@ Hasil keluaran model setelah dilakukan penanganan adalah sebagai berikut.
 $$yi = -924.881530 \ + \ 0.495301$$
 Hasil juga menunjukkan bahwa nilai dW dan $p-value$ meningkat menjadi $1.75467$ dan $0.02092$. Nilai dW sudah berada pada rentang $dU < dW < 4-dU$ atau $1.3605 < dW < 2.6395$. Tetapi pada $p-value$ masih Tolak H0 yang artinya masih terdapat autokorelasi dalam taraf nyata 5% meskipun telah dilakukan penanganan, tetapi dalam taraf nyata 1% sudah tidak ada autokorelasi. Sehingga perlu metode lain untuk melakukan penanganan autokorelasinya. Kita akan melakukan penanganan menggunakan Hildreth-Lu.
 
+```{r}
+rho<- modelCO$rho
+rho
+```
+
+Selanjutnya akan dilakukan transformasi secara manual.
+
+```{r}
+df$IPM[-1]
+```
+
+```{r}
+ipm.trans<- df$IPM[-1]-df$IPM[-12]*rho
+tahun.trans<- df$Tahun[-1]-df$Tahun[-12]*rho
+modelCOmanual<- lm(ipm.trans~tahun.trans)
+summary(modelCOmanual)
+```
+
+Hasil model transformasi bukan merupakan model sesungguhnya. Koefisien regresi masih perlu dicari kembali.
+
+```{r}
+b0bintang <- modelCOmanual$coefficients[-2]
+b0 <- b0bintang/(1-rho)
+b1 <- modelCOmanual$coefficients[-1]
+b0
+```
+
+```{r}
+b1
+```
+
+Hasil perhitungan koefisien regresi tersebut akan menghasilkan hasil yang sama dengan model yang dihasilkan menggunakan packages.
+
 ## Hildreth-Lu
 
 ```{r}
