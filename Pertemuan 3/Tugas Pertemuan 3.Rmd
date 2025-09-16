@@ -1,0 +1,60 @@
+---
+title: "Latihan 3 MPDW"
+author: "Wiska Radhia Firdaus - G1401231017"
+date: "2025-09-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Library
+
+```{r}
+library(dLagM)
+library(dynlm)
+library(MLmetrics)
+library(lmtest)
+library(car)
+library(readr)
+library(dplyr)
+```
+
+# Import Data
+
+```{r}
+data <- read.csv("D:\\File\\Data Science\\Semester 5\\MPDW\\Praktikum\\Minggu 4\\NewDelhi_Air_quality.csv")
+head(data)
+```
+
+```{r}
+str(data)
+```
+
+```{r}
+df <- data %>% select(-c('X', 'datetime', 'no2', 'o3', 'pm10', 'pm25', 'so2', 'timestamp_local', 'timestamp_utc', 'ts'))
+head(df)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
