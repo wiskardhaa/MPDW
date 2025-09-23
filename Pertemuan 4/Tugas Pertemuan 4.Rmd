@@ -57,7 +57,9 @@ ma2_sim
 ### Plot Time Series
 
 ```{r}
+par(mfrow = c(1, 2))
 ts.plot(ma2, main = "MA(2)", ylab = "Nilai")
+ts.plot(ma2_sim, main = "MA(2)", ylab = "Nilai")
 ```
 
 Berdasarkan plot time series, terlihat bahwa MA(2) yang dibangkitkan stasioner dalam rataan.
@@ -65,7 +67,9 @@ Berdasarkan plot time series, terlihat bahwa MA(2) yang dibangkitkan stasioner d
 ### Plot ACF
 
 ```{r}
+par(mfrow = c(1, 2))
 acf(ma2,lag.max = 10)
+acf(ma2_sim,lag.max = 10)
 ```
 
 Berdasarkan plot ACF tersebut, terlihat bahwa plot ACF dari MA(2) cuts off di lag kedua.
@@ -73,7 +77,9 @@ Berdasarkan plot ACF tersebut, terlihat bahwa plot ACF dari MA(2) cuts off di la
 ### Plot PACF
 
 ```{r}
+par(mfrow = c(1, 2))
 pacf(ma2)
+pacf(ma2_sim)
 ```
 
 Berdasarkan plot PACF tersebut, terlihat bahwa plot PACF dari MA(2) cenderung tails off.
@@ -82,6 +88,7 @@ Berdasarkan plot PACF tersebut, terlihat bahwa plot PACF dari MA(2) cenderung ta
 
 ```{r}
 TSA::eacf(ma2)
+TSA::eacf(ma2_sim)
 ```
 
 Berdasarkan pola segitiga nol pada plot EACF, terlihat bahwa segitiga nol berada pada ordo AR(0) dan ordo MA(2)
@@ -92,55 +99,61 @@ Berdasarkan pola segitiga nol pada plot EACF, terlihat bahwa segitiga nol berada
 
 ```{r}
 yt_ma <- ma2[-1]
-yt_ma
-```
-
-```{r}
 yt_1_ma <- ma2[-300]
-yt_1_ma
+
+yt_ma_sim <- ma2_sim[-1]
+yt_1_ma_sim <- ma2_sim[-300]
 ```
 
 ```{r}
+par(mfrow = c(1, 2))
 plot(y = yt_ma, x = yt_1_ma)
+plot(y = yt_ma_sim, x = yt_1_ma_sim)
 ```
 
 Berdasarkan scatterplot tersebut, terlihat bahwa terdapat hubungan positif antara $Y_t$ dengan $Y_{t−1}$. Hal ini sesuai dengan teori yang ada.
 
 ```{r}
 cor(yt_ma, yt_1_ma)
+cor(yt_ma_sim, yt_1_ma_sim)
 ```
 
-Korelasi antara $Y_t$ dengan $Y_{t−1}$ memiliki nilai $0.5324983$ yang artinya ada hubungan linear yang cukup kuat antara $Y_t$ dengan $Y_{t−1}$. Perhitungan teoritis:
+Korelasi antara $Y_t$ dengan $Y_{t−1}$ memiliki nilai $0.5324983$ (manual) atau $0.527313$ (arima.sim) yang artinya ada hubungan linear yang cukup kuat antara $Y_t$ dengan $Y_{t−1}$.
+
+### Autokorelasi Teoritis
 
 $$
 \rho_1 = \frac{-\theta_{1}+\theta_{1}\theta_{2}}{1+(\theta_{1})^2+(\theta_{2})^2} 
 = \frac{-(-0.4)+(-0.4)(-0.6)}{1+(-0.4)^2+(-0.6)^2} 
-= 0.421
+\approx 0.421
 $$
 
 ### Korelasi antara $Y_{t}$ dengan $Y_{t-2}$
 
 ```{r}
 yt_ma2 <- ma2[-c(1,2)]
-yt_ma2
-```
-
-```{r}
 yt_2_ma <- ma2[-c(299,300)]
-yt_2_ma
+
+yt_ma2_sim <- ma2_sim[-c(1,2)]
+yt_2_ma_sim <- ma2_sim[-c(299,300)]
 ```
 
 ```{r}
+par(mfrow = c(1,2))
 plot(y = yt_ma2, x = yt_2_ma)
+plot(y = yt_ma2_sim, x = yt_2_ma_sim)
 ```
 
 Berdasarkan scatterplot tersebut, terlihat bahwa terdapat hubungan positif antara $Y_t$ dengan $Y_{t−2}$. Hal ini masih sesuai dengan teori yang ada.
 
 ```{r}
 cor(yt_ma2, yt_2_ma)
+cor(yt_ma2_sim, yt_2_ma_sim)
 ```
 
-Korelasi antara $Y_t$ dengan $Y_{t−2}$ memiliki nilai $0.329209$ yang artinya ada hubungan linear yang cukup kuat antara $Y_t$ dengan $Y_{t−2}$. Perhitungan teoritis:
+Korelasi antara $Y_t$ dengan $Y_{t−2}$ memiliki nilai $0.329209$ (manual) atau $0.3195598$ (arima.sim) yang artinya ada hubungan linear yang cukup kuat antara $Y_t$ dengan $Y_{t−2}$.
+
+### Autokorelasi Teoritis
 
 $$
 \rho_2 = \frac{-\theta_{2}}{1+(\theta_{1})^2+(\theta_{2})^2} 
@@ -152,23 +165,26 @@ $$
 
 ```{r}
 yt_ma3 <- ma2[-c(1,2,3)]
-yt_ma3
-```
-
-```{r}
 yt_3_ma <- ma2[-c(298,299,300)]
-yt_3_ma
+
+yt_ma3_sim <- ma2_sim[-c(1,2,3)]
+yt_3_ma_sim <- ma2_sim[-c(298,299,300)]
 ```
 
 ```{r}
+par(mfrow = c(1,2))
 plot(y = yt_ma3, x = yt_3_ma)
+plot(y = yt_ma3_sim, x = yt_3_ma_sim)
 ```
 
 Berdasarkan scatterplot tersebut, terlihat bahwa cenderung tidak terdapat hubungan antara $Y_t$ dengan $Y_{t−3}$
 
 ```{r}
 cor(yt_ma3, yt_3_ma)
+cor(yt_ma3_sim, yt_3_ma_sim)
 ```
+
+### Autokorelasi Teoritis
 
 Korelasi antara $Y_t$ dengan $Y_{t−3}$ mendekati angka 0 yang artinya hampir tidak ada hubungan linear antara $Y_t$ dengan $Y_{t−3}$.
 
@@ -201,7 +217,9 @@ ar2_sim
 ### Plot Time Series
 
 ```{r}
+par(mfrow = c(1,2))
 ts.plot(ar2)
+ts.plot(ar2_sim)
 ```
 
 Berdasarkan plot time series, terlihat bahwa AR(2) yang dibangkitkan stasioner dalam rataan.
@@ -209,7 +227,9 @@ Berdasarkan plot time series, terlihat bahwa AR(2) yang dibangkitkan stasioner d
 ### Plot ACF
 
 ```{r}
+par(mfrow = c(1,2))
 acf(ar2)
+acf(ar2_sim)
 ```
 
 Berdasarkan plot ACF tersebut terlihat bahwa plot ACF dari AR(2) cenderung tails off dan cenderung membentuk pola grafik sinus.
@@ -217,7 +237,9 @@ Berdasarkan plot ACF tersebut terlihat bahwa plot ACF dari AR(2) cenderung tails
 ### Plot PACF
 
 ```{r}
-pacf(ar2, lag.max = 10)
+par(mfrow = c(1,2))
+pacf(ar2)
+pacf(ar2_sim)
 ```
 
 Berdasarkan plot PACF tersebut, terlihat bahwa plot PACF dari AR(2) cuts off di lag pertama. Hal ini bisa terjadi karena $\phi_{2}$ cukup kecil dibanding $\phi_{1}$ sehingga estimasi PACF pada lag 2 bisa sangat kecil.
@@ -226,6 +248,7 @@ Berdasarkan plot PACF tersebut, terlihat bahwa plot PACF dari AR(2) cuts off di 
 
 ```{r}
 TSA::eacf(ar2)
+TSA::eacf(ar2_sim)
 ```
 
 Berdasarkan pola segitiga nol pada plot EACF, terlihat bahwa plot tersebut bukan membentuk AR(2) melainkan AR(1). Hal ini bisa terjadi karena sinyal lag 2 bisa lemah sehingga estimasi PACF lag 2 tidak signifikan yang mengakibatkan EACF menganggap p = 1.
@@ -236,25 +259,28 @@ Berdasarkan pola segitiga nol pada plot EACF, terlihat bahwa plot tersebut bukan
 
 ```{r}
 yt_ar <- ar2[-1]
-yt_ar
-```
-
-```{r}
 yt_1_ar <- ar2[-300]
-yt_1_ar
+
+yt_ar_sim <- ar2_sim[-1]
+yt_1_ar_sim <- ar2_sim[-300]
 ```
 
 ```{r}
+par(mfrow = c(1,2))
 plot(y = yt_ar, x = yt_1_ar)
+plot(y = yt_ar_sim, x = yt_1_ar_sim)
 ```
 
 Berdasarkan scatterplot tersebut, terlihat bahwa terdapat hubungan positif antara $Y_t$ dengan $Y_{t−1}$. Hal ini sesuai dengan teori yang ada.
 
 ```{r}
 cor(yt_ar, yt_1_ar)
+cor(yt_ar_sim, yt_1_ar_sim)
 ```
 
-Korelasi antara $Y_t$ dengan $Y_{t−1}$ memiliki nilai $0.6734004$ yang artinya ada hubungan linear yang cukup kuat antara $Y_t$ dengan $Y_{t−1}$. Perhitungan teoritis:
+Korelasi antara $Y_t$ dengan $Y_{t−1}$ memiliki nilai $0.6734004$ (manual) atau $0.6638093$ (arimma.sim) yang artinya ada hubungan linear yang cukup kuat antara $Y_t$ dengan $Y_{t−1}$.
+
+### Autokorelasi Teoritis
 
 $$
 \rho_{1} = \frac{\phi_{1}}{1 - \phi_{2}}
@@ -266,25 +292,28 @@ $$
 
 ```{r}
 yt_ar2 <- ar2[-c(1,2)]
-yt_ar2
-```
-
-```{r}
 yt_2_ar <- ar2[-c(299,300)]
-yt_2_ar
+
+yt_ar2_sim <- ar2_sim[-c(1,2)]
+yt_2_ar_sim <- ar2_sim[-c(299,300)]
 ```
 
 ```{r}
+par(mfrow = c(1,2))
 plot(y = yt_ar2, x = yt_2_ar)
+plot(y = yt_ar2_sim, x = yt_2_ar_sim)
 ```
 
 Berdasarkan scatterplot tersebut, terlihat bahwa terdapat hubungan positif antara $Y_t$ dengan $Y_{t−2}$. Hal ini masih sesuai dengan teori yang ada.
 
 ```{r}
 cor(yt_ar2, yt_2_ar)
+cor(yt_ar2_sim, yt_2_ar_sim)
 ```
 
-Korelasi antara $Y_t$ dengan $Y_{t−2}$ memiliki nilai $0.4788909$ yang artinya ada hubungan linear yang cukup kuat antara $Y_t$ dengan $Y_{t−2}$. Perhitungan teoritis:
+Korelasi antara $Y_t$ dengan $Y_{t−2}$ memiliki nilai $0.4788909$ (manual) atau $0.4667212$ (arima.sim) yang artinya ada hubungan linear yang cukup kuat antara $Y_t$ dengan $Y_{t−2}$.
+
+### Autokorelasi Teoritis
 
 $$
 \rho_{2} = \frac{\phi_{2}(1-\phi_{2})+(\phi_{1})^2}{1 - \phi_{2}}
@@ -296,25 +325,28 @@ $$
 
 ```{r}
 yt_ar3 <- ar2[-c(1,2,3)]
-yt_ar3
-```
-
-```{r}
 yt_3_ar <- ar2[-c(298,299,300)]
-yt_3_ar
+
+yt_ar3_sim <- ar2_sim[-c(1,2,3)]
+yt_3_ar_sim <- ar2_sim[-c(298,299,300)]
 ```
 
 ```{r}
+par(mfrow = c(1,2))
 plot(y = yt_ar3, x = yt_3_ar)
+plot(y = yt_ar3_sim, x = yt_3_ar_sim)
 ```
 
 Berdasarkan scatterplot tersebut, terlihat bahwa terdapat hubungan positif antara $Y_t$ dengan $Y_{t−3}$. Hal ini masih sesuai dengan teori yang ada.
 
 ```{r}
 cor(yt_ar3, yt_3_ar)
+cor(yt_ar3_sim, yt_3_ar_sim)
 ```
 
-Korelasi antara $Y_t$ dengan $Y_{t−3}$ memiliki nilai $0.3196784$ yang artinya ada hubungan linear yang lemah antara $Y_t$ dengan $Y_{t−3}$. Perhitungan teoritis:
+Korelasi antara $Y_t$ dengan $Y_{t−3}$ memiliki nilai $0.3196784$ (manual) atau $0.3163653$ (arima.simm) yang artinya ada hubungan linear yang lemah antara $Y_t$ dengan $Y_{t−3}$.
+
+### Autokorelasi Teoritis
 
 $$
 \rho_{3} = {\phi_{1}\rho_{2}+\phi_{2}\rho_{1}}
@@ -381,9 +413,6 @@ Berdasarkan plot PACF tersebut, terlihat bahwa plot PACF dari ARMA(2,2) cenderun
 
 ```{r}
 TSA::eacf(y.arma)
-```
-
-```{r}
 TSA::eacf(arma_sim)
 ```
 
@@ -395,70 +424,76 @@ Berdasarkan pola segitiga nol pada plot EACF, terlihat bahwa plot tersebut membe
 
 ```{r}
 yt_arma <- y.arma[-1]
-yt_arma
-```
-
-```{r}
 yt_1_arma <- y.arma[-300]
-yt_1_arma
+
+yt_arma_sim <- arma_sim[-1]
+yt_1_arma_sim <- arma_sim[-300]
 ```
 
 ```{r}
+par(mfrow = c(1,2))
 plot(y = yt_arma, x = yt_1_arma)
+plot(y = yt_arma_sim, x = yt_1_arma_sim)
 ```
 
 Berdasarkan scatterplot tersebut, terlihat bahwa terdapat hubungan positif antara $Y_t$ dengan $Y_{t−1}$. Hal ini sesuai dengan teori yang ada.
 
 ```{r}
 cor(yt_arma, yt_1_arma)
+cor(yt_arma_sim, yt_1_arma_sim)
 ```
 
-Korelasi antara $Y_t$ dengan $Y_{t−1}$ memiliki nilai $0.8692143$ yang artinya ada hubungan linear yang sangat kuat antara $Y_t$ dengan $Y_{t−1}$. Perhitungan teoritis:
+Korelasi antara $Y_t$ dengan $Y_{t−1}$ memiliki nilai $0.8692143$ (manual) atau $0.865305$ (arima.sim) yang artinya ada hubungan linear yang sangat kuat antara $Y_t$ dengan $Y_{t−1}$.
 
 ### Korelasi antara $Y_{t}$ dengan $Y_{t-2}$
 
 ```{r}
 yt_arma2 <- y.arma[-c(1,2)]
-yt_arma2
-```
-
-```{r}
 yt_2_arma <- y.arma[-c(299,300)]
-yt_2_arma
+
+yt_arma2_sim <- arma_sim[-c(1,2)]
+yt_2_arma_sim <- arma_sim[-c(299,300)]
 ```
 
 ```{r}
+par(mfrow = c(1,2))
 plot(y = yt_arma2, x = yt_2_arma)
+plot(y = yt_arma2_sim, x = yt_2_arma_sim)
 ```
 
 Berdasarkan scatterplot tersebut, terlihat bahwa terdapat hubungan positif antara $Y_t$ dengan $Y_{t−2}$. Hal ini masih sesuai dengan teori yang ada.
 
 ```{r}
 cor(yt_arma2, yt_2_arma)
+cor(yt_arma2_sim, yt_2_arma_sim)
 ```
 
-Korelasi antara $Y_t$ dengan $Y_{t−2}$ memiliki nilai $0.7104349$ yang artinya ada hubungan linear yang sangat kuat antara $Y_t$ dengan $Y_{t−2}$.
+Korelasi antara $Y_t$ dengan $Y_{t−2}$ memiliki nilai $0.7104349$ (manual) atau $0.7051511$ (arima.sim) yang artinya ada hubungan linear yang sangat kuat antara $Y_t$ dengan $Y_{t−2}$.
 
 ### Korelasi antara $Y_{t}$ dengan $Y_{t-3}$
 
 ```{r}
 yt_arma3 <- y.arma[-c(1,2,3)]
-yt_arma3
-```
-
-```{r}
 yt_3_arma <- y.arma[-c(298,299,300)]
-yt_3_arma
+
+yt_arma3_sim <- arma_sim[-c(1,2,3)]
+yt_3_arma_sim <- arma_sim[-c(298,299,300)]
 ```
 
 ```{r}
+par(mfrow = c(1,2))
 plot(y = yt_arma3, x = yt_3_arma)
+plot(y = yt_arma3_sim, x = yt_3_arma_sim)
 ```
 
 Berdasarkan scatterplot tersebut, terlihat bahwa terdapat hubungan positif antara $Y_t$ dengan $Y_{t−3}$. Hal ini sesuai dengan teori yang ada.
 
 ```{r}
 cor(yt_arma3, yt_3_arma)
+cor(yt_arma3_sim, yt_3_arma_sim)
 ```
 
-Korelasi antara $Y_t$ dengan $Y_{t−3}$ memiliki nilai $0.4936458$ yang artinya ada hubungan linear yang cukup kuat antara $Y_t$ dengan $Y_{t−3}$.
+Korelasi antara $Y_t$ dengan $Y_{t−3}$ memiliki nilai $0.4936458$ (manual) atau $0.480585$ (arima.sim) yang artinya ada hubungan linear yang cukup kuat antara $Y_t$ dengan $Y_{t−3}$.
+
+### Autokorelasi Teoritis
+
