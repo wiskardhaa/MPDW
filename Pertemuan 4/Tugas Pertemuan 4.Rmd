@@ -2,7 +2,7 @@
 title: "Latihan 3 MPDW"
 author: "Wiska Radhia Firdaus - G1401231017"
 date: "2025-09-16"
-output: html_document
+output: rmdformats::readthedown
 ---
 
 ```{r setup, include=FALSE}
@@ -34,6 +34,10 @@ Dapat terlihat bahwa white noise tidak memiliki autokorelasi dari ACF. Perhatika
 ## MA(2)
 
 ### Manual
+
+$$
+y_t = e_t-0.4e_{t-1}-0.6e_{t-2}
+$$
 
 ```{r}
 set.seed(1017)
@@ -445,6 +449,16 @@ cor(yt_arma_sim, yt_1_arma_sim)
 
 Korelasi antara $Y_t$ dengan $Y_{t−1}$ memiliki nilai $0.8692143$ (manual) atau $0.865305$ (arima.sim) yang artinya ada hubungan linear yang sangat kuat antara $Y_t$ dengan $Y_{t−1}$.
 
+### Autokorelasi Teoritis
+
+$$
+\rho_1 = \frac{(1 - \phi_2)\theta_1 + (\phi_1 - \phi_2)\theta_2 + \phi_1(1 + \theta_1^2 + \theta_2^2)}
+{(1 - \phi_2)(1 + \theta_1^2 + \theta_2^2) + 2(\phi_1 - \phi_2)\theta_1\theta_2}
+= \frac{(1 - 0.2)(0.4) + (0.5 - 0.2)(0.6) + 0.5(1 + 0.4^2 + 0.6^2)}
+{(1 - 0.2)(1 + 0.4^2 + 0.6^2) + 2(0.5 - 0.2)(0.4)(0.6)}
+= \frac{1.26}{1.36} \approx 0.926
+$$
+
 ### Korelasi antara $Y_{t}$ dengan $Y_{t-2}$
 
 ```{r}
@@ -469,6 +483,16 @@ cor(yt_arma2_sim, yt_2_arma_sim)
 ```
 
 Korelasi antara $Y_t$ dengan $Y_{t−2}$ memiliki nilai $0.7104349$ (manual) atau $0.7051511$ (arima.sim) yang artinya ada hubungan linear yang sangat kuat antara $Y_t$ dengan $Y_{t−2}$.
+
+### Autokorelasi Teoritis
+
+$$
+\rho_2 = \frac{(\phi_1 + \theta_1\theta_2)(1 - \phi_2) + (\phi_1^2 - \phi_2)(1 + \theta_1^2 + \theta_2^2) + \theta_2(\theta_1 + \phi_1\theta_2)}
+{(1 - \phi_2)(1 + \theta_1^2 + \theta_2^2) + 2(\phi_1 - \phi_2)\theta_1\theta_2}
+= \frac{(0.5 + 0.4 \times 0.6)(0.8) + (0.5^2 - 0.2)(1 + 0.4^2 + 0.6^2) + 0.6(0.4 + 0.5 \times 0.6)}
+{(1-0.2)(1 + 0.4^2 + 0.6^2) + 2(0.5 - 0.2)(0.4)(0.6)}
+= \frac{1.088}{1.36} = 0.8
+$$
 
 ### Korelasi antara $Y_{t}$ dengan $Y_{t-3}$
 
@@ -497,3 +521,8 @@ Korelasi antara $Y_t$ dengan $Y_{t−3}$ memiliki nilai $0.4936458$ (manual) ata
 
 ### Autokorelasi Teoritis
 
+$$
+\rho_3 = \phi_1 \rho_2 + \phi_2 \rho_1
+= (0.5)(0.8) + (0.2)(0.926)
+= 0.5852
+$$
