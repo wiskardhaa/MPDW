@@ -1,1 +1,189 @@
+---
+title: "Latihan 5 MPDW"
+author: "Wiska Radhia Firdaus - G1401231017"
+date: "2025-10-02"
+output: rmdformats::readthedown
+---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Library
+
+```{r}
+library(forecast)
+library(ggplot2)
+library(tsibble)
+library(tseries)
+library(MASS)
+```
+
+## Import Data
+
+```{r}
+data <- read.csv("D:\\File\\Data Science\\Semester 5\\MPDW\\Data MPDW Kelompok 1.csv")
+df <- data[126:250, ]
+df
+```
+
+Data yang digunakan adalah data saham BREN hari ke-126 hingga hari ke-250
+
+## Eksplorasi Data
+
+```{r}
+mean <- mean(df$Close)
+mean
+```
+
+```{r}
+var(df$Close)
+```
+
+## Pemeriksaan Kestasioneran Data
+### Plot Time Series
+
+```{r}
+dt <- ts(df$Close)
+
+plot <- dt |> as_tsibble() |> 
+  ggplot(aes(x = index, y = value)) + geom_line() + theme_bw() +
+  geom_hline(yintercept = mean, color = "red", linetype = "dashed") +
+  xlab("Periode") + ylab("Harga Close")
+plot
+```
+
+Pada plot deret waktu diatas terlihat bahwa data tidak stasioner baik dalam rataan yang ditandai dengan adanya tren yang berfluktuasi dan jauh dari nilai rataannya $8897.535$ serta dalam ragam, yang ditandai dengan perbedaan pelebaran pita pada plot.
+
+### Plot ACF
+
+```{r}
+acf(df$Close)
+```
+
+Terlihat bahwa plot ACF diatas membentuk pola tails off dan cenderung membentuk pola grafik sinus. Dari plot ini diperlukan adanya uji lanjut untuk memastikan kestasioneran datanya.
+
+### Uji ADF
+$H_0:Data \ Tidak \ Stasioner \ dalam \ Rataan$
+<br> $H_1:Data \ Stasioner \ dalam \ Rataan$
+
+```{r}
+tseries::adf.test(df$Close)
+```
+
+Hasil Uji ADF memperlihatkan nilai $p-value$ sebesar $0.1865$ yang lebih besar dari $\alpha=0.05$ sehingga Tak Tolak $H_0$ yang artinya data tidak stasioner dalam rataan, sesuai dengan plot ACF diatas.
+
+### Kestasioneran dalam Ragam
+
+```{r}
+index <- seq(126:250)
+bc = boxcox(df$Close~index, lambda = seq(-4,4,by=0.01))
+```
+
+```{r}
+lambda <- bc$x[which.max(bc$y)]
+lambda
+```
+
+```{r}
+ci_lambda <- bc$x[bc$y > max(bc$y) - 0.5 * qchisq(0.95, 1)]
+
+ci_lower <- min(ci_lambda)
+ci_upper <- max(ci_lambda)
+
+c(Batas_Bawah = ci_lower, Batas_Atas = ci_upper)
+```
+
+Hasil uji Box–Cox menunjukkan bahwa nilai $λ$ optimum adalah $0.33$. Pada selang kepercayaan diatas terlihat bahwa nilai batas bawah sebesar $-0.75$ dan batas atas sebesar $1.43$, sehingga nilai $\lambda=1$ berada dalam selang tersebut, artinya data stasioner dalam ragam.
+
+## Penanganan Ketidakstasioneran Data
+### Differencing I
+
+```{r}
+differencing1 <- diff(df$Close, differences = 1)
+
+ts.plot(differencing1,
+        main = "First-order Differencing dari data",
+        col = "blue", lwd = 2)
+```
+
+```{r}
+length(differencing1)
+```
+
+Setelah dilakukan proses differencing, terlihat bahwa data cenderung stasioner dalam rataan, namun hal tersebut masih perlu dipastikan melalui plot ACF dan Uji ADF.
+
+### Plot ACF setelah Penanganan
+
+```{r}
+acf(differencing1)
+```
+
+Pada plot ACF diatas terlihat bahwa tidak plot tidak mengalami penurunan perlahan (tails off) hanya saja masih signifikan di lag ke-1, tetapi secara keseluruhan plot ACF ini menggambarkan bahwa data sudah stasioner dalam rataan yang akan dibuktikan pada uji ADF.
+
+### Uji ADF setelah Penanganan
+
+```{r}
+adf.test(differencing1)
+```
+  
+Hasil Uji ADF memperlihatkan nilai $p-value$ sebesar $0.03482$ yang lebih kecil dari $\alpha=0.05$ sehingga Tolak $H_0$ yang artinya data stasioner dalam rataan, sesuai dengan plot ACF diatas.
+
+### Kestasioneran dalam Ragam setelah Penanganan
+
+```{r}
+index2 <- seq(126:249)
+
+bc <- boxcox(
+  differencing1 - min(differencing1) + 1 ~ index2,
+  lambda = seq(0, 5, by = 0.001)
+)
+```
+
+```{r}
+lambda <- bc$x[which.max(bc$y)]
+lambda
+```
+
+```{r}
+ci_lambda <- bc$x[bc$y > max(bc$y) - 0.5 * qchisq(0.95, 1)]
+
+ci_lower <- min(ci_lambda)
+ci_upper <- max(ci_lambda)
+
+c(Batas_Bawah = ci_lower, Batas_Atas = ci_upper)
+```
+
+Hasil uji Box–Cox menunjukkan bahwa nilai $λ$ optimum adalah $1.671$ dengan selang kepercayaan (1.269 2.153). Karena selang tersebut tidak memuat nilai $λ = 1$, maka dapat disimpulkan bahwa data tidak stasioner dalam ragam sehingga diperlukan transformasi.
+
+### Transformasi Box-Cox
+
+```{r}
+y_shift <- differencing1 - min(differencing1) + 1
+y_bc <- y_shift^2
+```
+
+```{r}
+index <- seq(126:249)
+
+bc <- boxcox(
+  y_bc ~ index,
+  lambda = seq(-2, 5, by = 0.001)
+)
+```
+
+```{r}
+lambda <- bc$x[which.max(bc$y)]
+lambda
+```
+
+```{r}
+ci_lambda <- bc$x[bc$y > max(bc$y) - 0.5 * qchisq(0.95, 1)]
+
+ci_lower <- min(ci_lambda)
+ci_upper <- max(ci_lambda)
+
+c(Batas_Bawah = ci_lower, Batas_Atas = ci_upper)
+```
+
+Hasil uji Box–Cox menunjukkan bahwa nilai $λ$ optimum adalah $0.835$. Pada selang kepercayaan diatas terlihat bahwa nilai batas bawah sebesar $0.635$ dan batas atas sebesar $1.076$, sehingga nilai $\lambda=1$ berada dalam selang tersebut, artinya data sudah stasioner dalam ragam.
